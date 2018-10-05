@@ -7,11 +7,11 @@ Developing an evaluator and simplifier for the simple Expression language
 You have installed `stack`, 
 cloned `CS3016-1819` from the SCSS GitLab,
 and done Exercise Zero.
+You have done a `git pull` to get the latest verison of the coursework repo.
 
 ## Task
 
 1. Open a command-line window and navigate to where you keep  `CS3016-1819`.
-2. Enter command `git pull` - this should result in a folder `Exercise01` appearing.
 3. Navigate into `Exercise01`.
 4. Enter `stack test`. 
 5. The tests fail. Read the test outcome carefully. 

@@ -2,6 +2,16 @@
 
 This repo contains the Haskell Labs/Exercises for CS3016 in academic year 2018-19.
 
+
+## Exercise One
+
+1. Goto the folder where you cloned the [GitLab repo](https://gitlab.scss.tcd.ie/butrfeld/CS3016-1819/).
+2. Give a `git pull` command to get the latest version of the repository.
+3. A new directory `Exercise01` should have appeared. 
+4. Enter it and read `Exercise01.md`.
+
+
+
 ## Installing Stack
 
 `stack` is installed on ICTLAB machines,
