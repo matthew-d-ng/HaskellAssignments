@@ -1,4 +1,4 @@
-{- butrfeld Andrew Butterfield -}
+{- ngm1 Matthew Ng -}
 module Ex01 where
 import Data.List ((\\))
 
@@ -38,8 +38,30 @@ type EDict = Dict String Double
   -- (1) a divide by zero operation was going to be performed;
   -- (2) the expression contains a variable not in the dictionary.
 
+evalOp d op x y
+  = let  r = eval d x ; s = eval d y
+  in case (r,s) of
+    (Just m,Just n)  ->  Just (m `op` n)
+    _                ->  Nothing
+
 eval :: EDict -> Expr -> Maybe Double
-eval d e = Just 1e-99
+
+eval d (Def x e1 e2)
+    = case eval d e1 of
+           Nothing -> Nothing
+           Just v1 -> eval (define d x v1) e2
+           
+eval d (Add x y) = evalOp d (+) x y
+eval d (Mul x y) = evalOp d (*) x y
+eval d (Sub x y) = evalOp d (-) x y
+eval d (Dvd x y)
+        = case (eval d x, eval d y) of
+               (Just m,Just n)
+                  ->  if n==0.0 then Nothing else Just (m/n)
+               _  ->  Nothing
+
+eval d (Var i) = find d i
+eval _ (Val a) = Just a
 
 -- Part 2 : Simplifying Expressions -- (57 marks) ------------------------------
 
