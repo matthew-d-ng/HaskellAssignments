@@ -89,44 +89,28 @@ simpVar d v
         Nothing    -> (Var v)
 
 simpAdd :: EDict -> Expr -> Expr -> Expr
-simpAdd d e1 e2
-  = let e1' = simp d e1
-        e2' = simp d e2
-    in case (e1', e2') of
-        (e, Val 0.0)   -> e
-        (Val 0.0, e)   -> e
-        (Val e, Val f) -> case eval d (Add (Val e) (Val f)) of Just h -> (Val h)
-        _              -> (Add e1' e2')
+simpAdd _ e (Val 0.0)     = e
+simpAdd _ (Val 0.0) e     = e
+simpAdd d (Val e) (Val f) = case eval d (Add (Val e) (Val f)) of Just h -> (Val h)
+simpAdd _ e1 e2           = (Add e1 e2)
 
 simpSub :: EDict -> Expr -> Expr -> Expr
-simpSub d e1 e2
-  = let e1' = simp d e1
-        e2' = simp d e2
-    in case (e1', e2') of
-        (e, Val 0.0)   -> e
-        (Val e, Val f) -> case eval d (Sub (Val e) (Val f)) of Just h -> (Val h)
-        _              -> (Sub e1' e2')
+simpSub _ e (Val 0.0)     = e
+simpSub d (Val e) (Val f) = case eval d (Sub (Val e) (Val f)) of Just h -> (Val h)
+simpSub _ e1 e2           = (Sub e1 e2)
 
 simpMul :: EDict -> Expr -> Expr -> Expr
-simpMul d e1 e2
-  = let e1' = simp d e1
-        e2' = simp d e2
-    in case (e1', e2') of
-        (e, Val 1.0)   -> e
-        (Val 1.0, e)   -> e
-        (Val e, Val f) -> case eval d (Mul (Val e) (Val f)) of Just h -> (Val h)
-        _              -> (Mul e1' e2')
+simpMul d e (Val 1.0)     = e
+simpMul d (Val 1.0) e     = e
+simpMul d (Val e) (Val f) = case eval d (Mul (Val e) (Val f)) of Just h -> (Val h)
+simpMul _ e1 e2           = (Mul e1 e2)
 
 simpDvd :: EDict -> Expr -> Expr -> Expr
-simpDvd d e1 e2
-  = let e1' = simp d e1
-        e2' = simp d e2
-    in case (e1', e2') of
-        (e, Val 0.0)   -> (Dvd e1' e2')
-        (e, Val 1.0)   -> e
-        (Val 0.0, e)   -> (Val 0.0)
-        (Val e, Val f) -> case eval d (Dvd (Val e) (Val f)) of Just h -> (Val h)
-        _              -> (Dvd e1' e2')
+simpDvd d e (Val 0.0)     = (Dvd e (Val 0.0))
+simpDvd d e (Val 1.0)     = e
+simpDvd d (Val 0.0) e     = (Val 0.0)
+simpDvd d (Val e) (Val f) = case eval d (Dvd (Val e) (Val f)) of Just h -> (Val h)
+simpDvd _ e1 e2           = (Dvd e1 e2)
 
 simpDef :: EDict -> Id -> Expr -> Expr -> Expr
-simpDef d v e1 e2 = (Val 1e-99)
+simpDef d v (Val e1) e2   = simp (define d v e1) e2
