@@ -1,4 +1,4 @@
--- Name: Joe Bloggs,  Username: blgj
+-- Name: Matthew Ng,  Username: ngm1
 module Ex00 where
 
-hello = "I am currently a failing exercise"
+hello = "Hello World :-)"

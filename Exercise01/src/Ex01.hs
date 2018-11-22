@@ -37,7 +37,6 @@ type EDict = Dict String Double
 -- eval should return Nothing if:
   -- (1) a divide by zero operation was going to be performed;
   -- (2) the expression contains a variable not in the dictionary.
-
 evalOp d op x y
   = let  r = eval d x ; s = eval d y
   in case (r,s) of
@@ -45,12 +44,11 @@ evalOp d op x y
     _                ->  Nothing
 
 eval :: EDict -> Expr -> Maybe Double
-
 eval d (Def x e1 e2)
     = case eval d e1 of
            Nothing -> Nothing
            Just v1 -> eval (define d x v1) e2
-           
+
 eval d (Add x y) = evalOp d (+) x y
 eval d (Mul x y) = evalOp d (*) x y
 eval d (Sub x y) = evalOp d (-) x y
@@ -84,19 +82,35 @@ simp _ e = e  -- simplest case, Val, needs no special treatment
     -- (2b) if any mention of v in e2 is inside another (Def v .. ..)
 
 simpVar :: EDict -> Id -> Expr
-simpVar d v = (Val 1e-99)
+simpVar d v
+  = let v' = eval d (Var v)
+    in case v' of
+        Just e     -> (Val e)
+        Nothing    -> (Var v)
 
 simpAdd :: EDict -> Expr -> Expr -> Expr
-simpAdd d e1 e2 = (Val 1e-99)
+simpAdd _ e (Val 0.0)     = e
+simpAdd _ (Val 0.0) e     = e
+simpAdd d (Val e) (Val f) = case eval d (Add (Val e) (Val f)) of Just h -> (Val h)
+simpAdd _ e1 e2           = (Add e1 e2)
 
 simpSub :: EDict -> Expr -> Expr -> Expr
-simpSub d e1 e2 = (Val 1e-99)
+simpSub _ e (Val 0.0)     = e
+simpSub d (Val e) (Val f) = case eval d (Sub (Val e) (Val f)) of Just h -> (Val h)
+simpSub _ e1 e2           = (Sub e1 e2)
 
 simpMul :: EDict -> Expr -> Expr -> Expr
-simpMul d e1 e2 = (Val 1e-99)
+simpMul d e (Val 1.0)     = e
+simpMul d (Val 1.0) e     = e
+simpMul d (Val e) (Val f) = case eval d (Mul (Val e) (Val f)) of Just h -> (Val h)
+simpMul _ e1 e2           = (Mul e1 e2)
 
 simpDvd :: EDict -> Expr -> Expr -> Expr
-simpDvd d e1 e2 = (Val 1e-99)
+simpDvd d e (Val 0.0)     = (Dvd e (Val 0.0))
+simpDvd d e (Val 1.0)     = e
+simpDvd d (Val 0.0) e     = (Val 0.0)
+simpDvd d (Val e) (Val f) = case eval d (Dvd (Val e) (Val f)) of Just h -> (Val h)
+simpDvd _ e1 e2           = (Dvd e1 e2)
 
 simpDef :: EDict -> Id -> Expr -> Expr -> Expr
-simpDef d v e1 e2 = (Val 1e-99)
+simpDef d v (Val e1) e2   = simp (define d v e1) e2
